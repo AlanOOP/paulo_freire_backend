@@ -1,12 +1,15 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import connectDB  from './config/db.js';
+import connectDB from './config/db.js';
 
 
 // import routes
 import academyActivitiesRoutes from './routes/academyActivitiesRoutes.js';
-
+import blogRoutes from './routes/blogRoutes.js';
+import customsizeRoutes from './routes/customsizeRoutes.js';
+import imageActivityRoutes from './routes/imageActivityRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 dotenv.config();
@@ -21,7 +24,11 @@ app.get('/', (req, res) => {
 });
 
 //Routes
-app.use('/api',academyActivitiesRoutes);
+app.use('/api', academyActivitiesRoutes);
+app.use('/api', blogRoutes);
+app.use('/api', customsizeRoutes);
+app.use('/api', imageActivityRoutes);
+app.use('/api', userRoutes);
 
 
 connectDB();

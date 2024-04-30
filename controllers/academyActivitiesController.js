@@ -9,8 +9,124 @@ const getAcademyActivities = async (req, res) => {
     }
 }
 
+const getAcademyActivityById = async (req, res) => {
+
+    const { id } = req.file;
+
+    try {
+        if (!id) {
+            const error = new Error('Id requerido');
+            return res.status(400).json(error.message);
+        }
+
+        const academyActivity = await AcademyActivities.findById(id);
+
+        if (!academyActivity) {
+            const error = new Error('Actividad no encontrada');
+            return res.status(400).json(error.message);
+        }
+
+        res.json(academyActivity);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+//creat academy activity
+
+const createAcademyActivity = async (req, res) => {
+
+    const { title, description } = req.body;
+
+    try {
+
+        if (!title || !description) {
+            const error = new Error('Todos los campos son necesarios');
+            return res.status(400).json(error.message);
+        }
+
+        const academyActivity = new AcademyActivities({
+            title,
+            description
+        });
+
+        await academyActivity.save();
+
+        res.json(academyActivity);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: error.message });
+    }
+}
 
 
-export{
-    getAcademyActivities
+//update academy activity
+const updateAcademyActivity = async (req, res) => {
+    const { id } = req.params;
+    const { title, description } = req.body;
+
+    try {
+        if (!id) {
+            const error = new Error('Id requerido');
+            return res.status(400).json(error.message);
+        }
+
+        if (!title || !description) {
+            const error = new Error('Todos los campos son necesarios');
+            return res.status(400).json(error.message);
+        }
+
+        const academyActivity = await AcademyActivities.findById(id);
+
+        if (!academyActivity) {
+            const error = new Error('Actividad no encontrada');
+            return res.status(400).json(error.message);
+        }
+
+        academyActivity.title = title;
+        academyActivity.description = description;
+
+        await academyActivity.save();
+
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+const deleteAcademyActivity = async (req, res) => {
+
+    const { id } = req.params;
+    try {
+        if (!id) {
+            const error = new Error('Id requerido');
+            return res.status(400).json(error.message);
+        }
+
+        const academyActivity = await AcademyActivities.findById(id);
+
+        if (!academyActivity) {
+            const error = new Error('Actividad no encontrada');
+            return res.status(400).json(error.message);
+        }
+
+        await AcademyActivities.findByIdAndDelete(id);
+
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export {
+    getAcademyActivities,
+    getAcademyActivityById,
+    createAcademyActivity,
+    updateAcademyActivity,
+    deleteAcademyActivity
 }
