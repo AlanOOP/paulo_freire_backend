@@ -12,12 +12,12 @@ import imageActivityRoutes from './routes/imageActivityRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 
 const app = express();
-dotenv.config();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+dotenv.config();
 
 app.get('/', (req, res) => {
     res.send('Hello World');

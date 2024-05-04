@@ -9,6 +9,8 @@ const getAcademyActivities = async (req, res) => {
     }
 }
 
+
+
 const getAcademyActivityById = async (req, res) => {
 
     const { id } = req.file;

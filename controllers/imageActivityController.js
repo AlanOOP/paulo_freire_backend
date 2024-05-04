@@ -1,5 +1,7 @@
 import ImageActivity from "../models/ImageActivity.js";
 import cloudinary from '../utils/cloudinary.js';
+import AcademyActivities from "../models/AcademyActivities.js";
+import path, { dirname } from "path";
 
 const getImagesActivity = async (req, res) => {
     try {
@@ -9,6 +11,26 @@ const getImagesActivity = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+
+const getImageActivitiesById = async (req, res) => {
+    const { id_academy } = req.params;
+
+    try {
+        if (!id_academy) {
+            const error = new Error('Id requerido');
+            return res.status(400).json(error.message);
+        }
+
+        const images = await ImageActivity.find({ academyActivity: id_academy });
+        res.json(images);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+
 
 const getImageActivityById = async (req, res) => {
     const { id } = req.params;
@@ -37,7 +59,7 @@ const getImageActivityById = async (req, res) => {
 
 const createImageActivity = async (req, res) => {
 
-    const { description } = req.body;
+    const { id, description } = req.body;
     let img = req.file;
 
     try {
@@ -47,6 +69,11 @@ const createImageActivity = async (req, res) => {
             return res.status(400).json(error.message);
         }
 
+        const academyActivity = await AcademyActivities.findById(id);
+        if (!academyActivity) {
+            const error = new Error('Actividad no encontrada');
+            return res.status(400).json(error.message);
+        }
         const result = await cloudinary.uploader.upload(img.path, {
             folder: "images",
             width: 1200,
@@ -56,7 +83,8 @@ const createImageActivity = async (req, res) => {
         const newImage = new ImageActivity({
             description,
             url: result.url,
-            public_id: result.public_id
+            public_id: result.public_id,
+            academyActivity: id
         });
 
         await newImage.save();
@@ -90,7 +118,7 @@ const deleteImageActivity = async (req, res) => {
 
         await cloudinary.uploader.destroy(image.public_id);
 
-        await image.remove();
+        await ImageActivity.findByIdAndDelete(id);
 
         res.json({ message: 'Imagen eliminada' });
 
@@ -105,5 +133,6 @@ export {
     getImagesActivity,
     getImageActivityById,
     createImageActivity,
-    deleteImageActivity
+    deleteImageActivity,
+    getImageActivitiesById
 };
