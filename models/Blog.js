@@ -9,9 +9,13 @@ const blogSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    date: {
+        type: String,
+        required: true,
+    },
     img: {
-        type: Date,
-        default: Date.now,
+        type: String,
+        required: true,
     },
     public_id: {
         type: String,

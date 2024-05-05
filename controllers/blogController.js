@@ -17,7 +17,14 @@ const getBlogs = async (req, res) => {
 //get blog by id 
 const getBlogById = async (req, res) => {
     const { id } = req.params;
+
     try {
+        if (!id) {
+            const error = new Error('Campos Requeridos');
+     
+            return res.status(400).json(error.message);
+        }
+
         const blog = await Blog.findById(id);
 
         if (!blog) {
@@ -36,11 +43,14 @@ const getBlogById = async (req, res) => {
 
 //crear un blog
 const createBlog = async (req, res) => {
-    const { title, description } = req.body;
+    const { title, description, date } = req.body;
     let img = req.file;
 
+    console.log(title, description, date);
+
+    console.log(img);
     try {
-        if (!title || !description || !img) {
+        if (!title || !description || !date || !img) {
             const error = new Error('Por favor llene todos los campos');
             return res.status(400).json(error.message);
         }
@@ -54,11 +64,14 @@ const createBlog = async (req, res) => {
         const newBlog = new Blog({
             title,
             description,
-            img: result.result.url,
+            date,
+            img: result.url,
             public_id: result.public_id
         });
 
         await newBlog.save();
+
+        res.json({ message: 'Blog Creado Correctamente' });
 
     } catch (error) {
         console.log(error);
@@ -72,11 +85,11 @@ const createBlog = async (req, res) => {
 
 const updateBlog = async (req, res) => {
     const { id } = req.params;
-    const { title, description } = req.body;
-    let img = req.file;
+    const { title, description, date } = req.body;
+
 
     try {
-        if (!title || !description) {
+        if (!title || !description || !date) {
             const error = new Error('Por favor llene todos los campos');
             return res.status(400).json(error.message);
         }
@@ -89,7 +102,8 @@ const updateBlog = async (req, res) => {
             return res.status(404).json(error.message);
         }
 
-        if (img) {
+        if (req.file) {
+            const img = req.file;
             await cloudinary.uploader.destroy(blog.public_id);
             const result = await cloudinary.uploader.upload(img.path, {
                 folder: 'blog',
@@ -103,6 +117,7 @@ const updateBlog = async (req, res) => {
 
         blog.title = title;
         blog.description = description;
+        blog.date = date;
 
         await blog.save();
 
@@ -121,7 +136,8 @@ const deleteBlog = async (req, res) => {
             const error = new Error('Campos Requeridos');
             return res.status(400).json(error.message);
         }
-        const blogExist = Blog.findById(id);
+
+        const blogExist = await Blog.findById(id);
 
         if (!blogExist) {
             const error = new Error('Blog no encontrado');
