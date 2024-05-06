@@ -17,13 +17,16 @@ const getImageActivitiesById = async (req, res) => {
     const { id_academy } = req.params;
 
     try {
+
         if (!id_academy) {
             const error = new Error('Id requerido');
             return res.status(400).json(error.message);
-        }
 
-        const images = await ImageActivity.find({ academyActivity: id_academy });
-        res.json(images);
+        } else {
+
+            const images = await ImageActivity.find({ academyActivity: id_academy });
+            res.json(images);
+        }
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: error.message });
